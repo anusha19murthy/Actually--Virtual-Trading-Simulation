@@ -1,0 +1,119 @@
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  /* Obsidian Terminal - Light Mode */
+  --bg-root: #f0f2f4;
+  --bg-base: #f7f8fa;
+  --bg-surface: #ffffff;
+  --bg-card: #ffffff;
+  --bg-elevated: #f0f3f5;
+  --bg-hover: #e8ecef;
+  
+  --border-dim: #e2e6ea;
+  --border-default: #d4dade;
+  --border-strong: #bcc4c9;
+  
+  --text-primary: #0a0f11;
+  --text-secondary: #4a5f69;
+  --text-muted: #8fa4ae;
+  
+  --accent: #00b87a;
+  --accent-dim: rgba(0, 184, 122, 0.08);
+  --accent-glow: rgba(0, 184, 122, 0.15);
+  
+  --red: #d93256;
+  --red-dim: rgba(217, 50, 86, 0.10);
+  
+  --blue: #2277e6;
+  --yellow: #d4a800;
+  
+  /* Typography */
+  --font-heading: 'Space Grotesk', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  --font-ui: 'Inter', sans-serif;
+  
+  /* Dot grid pattern */
+  --dot-grid: radial-gradient(circle, rgba(0, 0, 0, 0.04) 1px, transparent 1px);
+  --dot-size: 24px;
+}
+
+.dark {
+  /* Obsidian Terminal - Dark Mode */
+  --bg-root: #080909;
+  --bg-base: #0d0f10;
+  --bg-surface: #111415;
+  --bg-card: #141718;
+  --bg-elevated: #1a1e1f;
+  --bg-hover: #1f2425;
+  
+  --border-dim: #1c2022;
+  --border-default: #242b2d;
+  --border-strong: #2e373a;
+  
+  --text-primary: #e2e8ea;
+  --text-secondary: #7d9099;
+  --text-muted: #3d5059;
+  
+  --accent: #05f0a0;
+  --accent-dim: rgba(5, 240, 160, 0.08);
+  --accent-glow: rgba(5, 240, 160, 0.15);
+  
+  --red: #f03d5f;
+  --red-dim: rgba(240, 61, 95, 0.10);
+  
+  --blue: #3d9bff;
+  --yellow: #f5c842;
+  
+  /* Dot grid pattern */
+  --dot-grid: radial-gradient(circle, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+}
+
+@theme inline {
+  /* Legacy Tailwind mappings for compatibility */
+  --color-background: var(--bg-base);
+  --color-foreground: var(--text-primary);
+  --color-card: var(--bg-card);
+  --color-card-foreground: var(--text-primary);
+  --color-primary: var(--text-primary);
+  --color-secondary: var(--text-secondary);
+  --color-muted: var(--text-muted);
+  --color-muted-foreground: var(--text-muted);
+  --color-accent: var(--accent);
+  --color-destructive: var(--red);
+  --color-border: var(--border-default);
+  --radius-lg: 10px;
+  --radius-md: 6px;
+  --radius-sm: 4px;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    font-family: var(--font-ui);
+    background: var(--bg-root);
+    background-image: var(--dot-grid);
+    background-size: var(--dot-size) var(--dot-size);
+    color: var(--text-primary);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Typography defaults */
+  h1, h2, h3 {
+    font-family: var(--font-heading);
+    letter-spacing: -0.02em;
+  }
+
+  /* Tabular numbers for all numeric content */
+  .tabular-nums {
+    font-variant-numeric: tabular-nums;
+  }
+  
+  /* Transitions */
+  button, a, [role="button"] {
+    transition: all 150ms ease;
+  }
+}
