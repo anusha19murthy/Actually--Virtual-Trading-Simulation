@@ -1,190 +1,157 @@
-import { Search, Wallet, Bell, ChevronRight } from 'lucide-react';
-import { ThemeToggle } from './ThemeToggle';
-import { useLocation } from 'react-router';
+import React, { useState, useRef, useEffect } from 'react';
+import { Search, Wallet, TrendingUp, TrendingDown, LogOut, Menu, X } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
+import { Link } from 'react-router';
 
-interface TopBarProps {
-  walletBalance: number;
-  profitLoss: number;
-  profitLossPercent: number;
-}
+const POPULAR_STOCKS = [
+  { symbol: 'NVDA', name: 'NVIDIA Corp', type: 'Equity', currency: 'USD' },
+  { symbol: 'AAPL', name: 'Apple Inc.', type: 'Equity', currency: 'USD' },
+  { symbol: 'GOOGL', name: 'Alphabet Inc.', type: 'Equity', currency: 'USD' },
+  { symbol: 'META', name: 'Meta Platforms', type: 'Equity', currency: 'USD' },
+  { symbol: 'TSLA', name: 'Tesla Inc.', type: 'Equity', currency: 'USD' },
+  { symbol: 'AMZN', name: 'Amazon.com Inc.', type: 'Equity', currency: 'USD' },
+  { symbol: 'JPM', name: 'JPMorgan Chase', type: 'Equity', currency: 'USD' },
+  { symbol: 'V', name: 'Visa Inc.', type: 'Equity', currency: 'USD' },
+];
 
-export function TopBar({ walletBalance, profitLoss, profitLossPercent }: TopBarProps) {
-  const isProfit = profitLoss >= 0;
-  const location = useLocation();
-  const marketOpen = true; // Mock market status
+export default function TopBar() {
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState<typeof POPULAR_STOCKS>([]);
+  const [showResults, setShowResults] = useState(false);
+  const searchRef = useRef<HTMLDivElement>(null);
+  const { user, logout } = useAuth();
 
-  // Get page name from route
-  const getPageName = () => {
-    const path = location.pathname;
-    if (path === '/') return 'Dashboard';
-    if (path === '/portfolio') return 'Portfolio';
-    if (path === '/markets') return 'Markets';
-    if (path === '/trade') return 'Buy/Sell';
-    if (path === '/watchlist') return 'Watchlist';
-    if (path === '/transactions') return 'Transactions';
-    if (path === '/profile') return 'Profile';
-    if (path === '/settings') return 'Settings';
-    if (path === '/leaderboard') return 'Leaderboard';
-    return 'Dashboard';
-  };
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
+        setShowResults(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  useEffect(() => {
+    if (searchQuery.trim() === '') {
+      setSearchResults([]);
+      setShowResults(false);
+      return;
+    }
+
+    const filtered = POPULAR_STOCKS.filter(stock =>
+      stock.symbol.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      stock.name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+    setSearchResults(filtered);
+    setShowResults(true);
+  }, [searchQuery]);
 
   return (
-    <div 
-      className="h-[52px] flex items-center justify-between px-6 border-b"
-      style={{
-        backgroundColor: 'var(--bg-surface)',
-        borderColor: 'var(--border-dim)'
-      }}
-    >
-      {/* Left: Breadcrumb */}
-      <div className="flex items-center gap-2">
-        <span 
-          className="text-xs"
-          style={{ 
-            fontFamily: 'var(--font-ui)',
-            color: 'var(--text-muted)'
-          }}
-        >
-          Home
-        </span>
-        <ChevronRight className="w-3 h-3" style={{ color: 'var(--text-muted)' }} />
-        <span 
-          className="text-xs font-medium"
-          style={{ 
-            fontFamily: 'var(--font-ui)',
-            color: 'var(--text-secondary)'
-          }}
-        >
-          {getPageName()}
-        </span>
-      </div>
-
-      {/* Center: Search */}
-      <div className="relative w-[320px]">
-        <Search 
-          className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5"
-          style={{ color: 'var(--text-muted)' }}
-        />
-        <input
-          type="text"
-          placeholder="Search stocks, indices..."
-          className="w-full h-8 pl-9 pr-3 rounded-md text-[13px] outline-none"
-          style={{
-            fontFamily: 'var(--font-ui)',
-            backgroundColor: 'var(--bg-elevated)',
-            border: '1px solid var(--border-default)',
-            color: 'var(--text-primary)',
-          }}
-          onFocus={(e) => {
-            e.currentTarget.style.borderColor = 'var(--accent)';
-            e.currentTarget.style.backgroundColor = 'var(--bg-surface)';
-          }}
-          onBlur={(e) => {
-            e.currentTarget.style.borderColor = 'var(--border-default)';
-            e.currentTarget.style.backgroundColor = 'var(--bg-elevated)';
-          }}
-        />
-      </div>
-
-      {/* Right: Status, Wallet, P/L, Theme, Notifications, Avatar */}
-      <div className="flex items-center gap-4">
-        {/* Market Status */}
-        <div className="flex items-center gap-2">
-          <div className="relative">
-            <div 
-              className="w-1.5 h-1.5 rounded-full"
-              style={{ backgroundColor: marketOpen ? 'var(--accent)' : 'var(--red)' }}
-            />
-            {marketOpen && (
-              <div 
-                className="absolute inset-0 w-1.5 h-1.5 rounded-full animate-ping"
-                style={{ backgroundColor: 'var(--accent)' }}
-              />
-            )}
+    <div className="fixed top-0 left-0 right-0 z-40 bg-background border-b border-border">
+      <div className="container mx-auto px-6 h-16 flex items-center justify-between gap-4">
+        {/* Logo */}
+        <Link to="/" className="flex items-center gap-2">
+          <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+            <span className="text-white font-bold text-lg">A</span>
           </div>
-          <span 
-            className="text-[11px] font-medium"
-            style={{ 
-              fontFamily: 'var(--font-ui)',
-              color: marketOpen ? 'var(--accent)' : 'var(--red)'
-            }}
-          >
-            {marketOpen ? 'NSE Open' : 'NSE Closed'}
-          </span>
+          <span className="text-xl font-bold text-foreground hidden sm:block">Actually</span>
+        </Link>
+
+        {/* Search Bar */}
+        <div className="flex-1 max-w-2xl relative" ref={searchRef}>
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <input
+              type="text"
+              placeholder="Search stocks — NVDA, TSLA, AAPL..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onFocus={() => searchQuery && setShowResults(true)}
+              className="w-full pl-10 pr-4 py-2 bg-card border border-border rounded-lg text-sm text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+            />
+          </div>
+
+          {/* Search Results Dropdown - FIXED WITH SOLID BACKGROUND */}
+          {showResults && searchResults.length > 0 && (
+            <div className="absolute top-full left-0 right-0 mt-2 bg-card border border-border rounded-lg shadow-2xl overflow-hidden max-h-96 overflow-y-auto z-50">
+              <div className="px-3 py-2 bg-accent border-b border-border">
+                <p className="text-xs text-muted-foreground font-medium">
+                  {searchResults.length} RESULTS FOR "{searchQuery.toUpperCase()}"
+                </p>
+              </div>
+              {searchResults.map((stock) => (
+                <Link
+                  key={stock.symbol}
+                  to="/markets"
+                  onClick={() => {
+                    setShowResults(false);
+                    setSearchQuery('');
+                  }}
+                  className="flex items-center gap-3 px-4 py-3 hover:bg-accent transition border-b border-border last:border-0 bg-card"
+                >
+                  <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                    <span className="text-sm font-bold text-primary">{stock.symbol.substring(0, 2)}</span>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-semibold text-foreground text-sm">{stock.symbol}</p>
+                    <p className="text-xs text-muted-foreground truncate">{stock.name}</p>
+                  </div>
+                  <div className="text-right flex-shrink-0">
+                    <span className="text-xs text-muted-foreground">{stock.type}</span>
+                    <p className="text-xs text-muted-foreground">{stock.currency}</p>
+                  </div>
+                </Link>
+              ))}
+              <div className="px-4 py-2 bg-accent border-t border-border">
+                <p className="text-xs text-muted-foreground">
+                  Click any result to go to Markets page
+                </p>
+              </div>
+            </div>
+          )}
         </div>
 
-        {/* Divider */}
-        <div className="w-px h-4" style={{ backgroundColor: 'var(--border-default)' }} />
+        {/* Right Side */}
+        <div className="flex items-center gap-4">
+          {/* Market Status */}
+          <div className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-green-500/10 rounded-full">
+            <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+            <span className="text-xs font-medium text-green-500">NSE Open</span>
+          </div>
 
-        {/* Wallet */}
-        <div className="flex items-center gap-2">
-          <Wallet className="w-3.5 h-3.5" style={{ color: 'var(--text-secondary)' }} />
-          <span 
-            className="text-sm font-medium tabular-nums"
-            style={{ 
-              fontFamily: 'var(--font-mono)',
-              color: 'var(--text-primary)'
-            }}
-          >
-            ${walletBalance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-          </span>
+          {/* Wallet */}
+          <div className="flex items-center gap-2 px-3 py-1.5 bg-card border border-border rounded-lg">
+            <Wallet className="w-4 h-4 text-primary" />
+            <div className="hidden sm:block">
+              <p className="text-xs text-muted-foreground leading-none mb-0.5">Wallet</p>
+              <p className="text-sm font-semibold text-foreground leading-none">
+                ₹{user ? user.cash.toLocaleString('en-IN', { maximumFractionDigits: 2 }) : '0.00'}
+              </p>
+            </div>
+          </div>
+
+          {/* P/L Badge (hidden on mobile) */}
+          <div className="hidden lg:flex items-center gap-1 px-3 py-1.5 bg-green-500/10 rounded-lg">
+            <TrendingUp className="w-4 h-4 text-green-500" />
+            <span className="text-sm font-semibold text-green-500">+₹0.00 (+0.00%)</span>
+          </div>
+
+          {/* User Avatar & Logout */}
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center">
+              <span className="text-white font-semibold text-sm">
+                {user?.username?.charAt(0).toUpperCase() || 'U'}
+              </span>
+            </div>
+            <button
+              onClick={logout}
+              className="p-2 hover:bg-accent rounded-lg transition"
+              title="Logout"
+            >
+              <LogOut className="w-4 h-4 text-muted-foreground" />
+            </button>
+          </div>
         </div>
-
-        {/* P/L Badge */}
-        <div 
-          className="px-2 py-1 rounded"
-          style={{
-            backgroundColor: isProfit ? 'var(--accent-dim)' : 'var(--red-dim)',
-            color: isProfit ? 'var(--accent)' : 'var(--red)'
-          }}
-        >
-          <span 
-            className="text-xs font-medium tabular-nums"
-            style={{ fontFamily: 'var(--font-mono)' }}
-          >
-            {isProfit ? '+' : ''}${profitLoss.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-            {' '}
-            ({isProfit ? '+' : ''}{profitLossPercent.toFixed(2)}%)
-          </span>
-        </div>
-
-        {/* Divider */}
-        <div className="w-px h-4" style={{ backgroundColor: 'var(--border-default)' }} />
-
-        {/* Theme Toggle */}
-        <ThemeToggle />
-
-        {/* Notifications */}
-        <button 
-          className="relative p-1.5 rounded-md"
-          style={{ color: 'var(--text-secondary)' }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.backgroundColor = 'var(--bg-hover)';
-            e.currentTarget.style.color = 'var(--text-primary)';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.backgroundColor = 'transparent';
-            e.currentTarget.style.color = 'var(--text-secondary)';
-          }}
-        >
-          <Bell className="w-4 h-4" />
-          <div 
-            className="absolute top-1 right-1 w-1.5 h-1.5 rounded-full"
-            style={{ backgroundColor: 'var(--red)' }}
-          />
-        </button>
-
-        {/* Avatar */}
-        <button 
-          className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-semibold"
-          style={{ 
-            backgroundColor: 'var(--accent)',
-            color: 'var(--bg-card)',
-            fontFamily: 'var(--font-ui)'
-          }}
-        >
-          JD
-        </button>
       </div>
     </div>
   );

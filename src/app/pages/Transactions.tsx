@@ -81,7 +81,7 @@ const mockTransactions: Transaction[] = [
   },
 ];
 
-export function Transactions() {
+export default function Transactions() {
   const buyCount = mockTransactions.filter((t) => t.type === 'buy').length;
   const sellCount = mockTransactions.filter((t) => t.type === 'sell').length;
 

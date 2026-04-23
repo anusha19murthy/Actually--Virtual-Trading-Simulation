@@ -1,130 +1,215 @@
-/// <reference types="vite/client" />
-import { NewsFeed } from '../components/NewsFeed';
-import { TrendingUp, TrendingDown } from 'lucide-react';
-import { useNavigate } from 'react-router';
-import { walletBalance, totalPortfolioValue, todayProfitLoss, todayProfitLossPercent, netWorth } from '../data/mockData';
+import React, { useState, useEffect } from 'react';
+import { TrendingUp, TrendingDown, DollarSign, Wallet, PieChart, Activity } from 'lucide-react';
+import TopBar from '../components/TopBar';
+import { useAuth } from '../context/AuthContext';
 
-export function Dashboard() {
-  return (
-    <div className="h-full flex flex-col overflow-hidden">
-      {/* Stats Bar */}
-      <div
-        className="h-[72px] flex items-stretch border-b"
-        style={{ backgroundColor: 'var(--bg-surface)', borderColor: 'var(--border-dim)' }}
-      >
-        <StatBlock label="Net Worth" value={netWorth} change={todayProfitLoss} changePercent={todayProfitLossPercent} />
-        <div className="w-px" style={{ backgroundColor: 'var(--border-dim)' }} />
-        <StatBlock label="Cash Balance" value={walletBalance} />
-        <div className="w-px" style={{ backgroundColor: 'var(--border-dim)' }} />
-        <StatBlock label="Portfolio Value" value={totalPortfolioValue} />
-        <div className="w-px" style={{ backgroundColor: 'var(--border-dim)' }} />
-        <StatBlock label="Today P/L" value={todayProfitLoss} change={todayProfitLoss} changePercent={todayProfitLossPercent} showSign />
-      </div>
+const USD_TO_INR = 83.5;
+const API_BASE = 'http://localhost:8000';
 
-      {/* Main Content */}
-      <div className="flex-1 p-6 grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-5 overflow-hidden">
-        <div className="flex flex-col gap-5 overflow-y-auto">
-          <RecentTransactions />
-        </div>
-        <div className="flex flex-col gap-5 overflow-y-auto">
-          <NewsFeed />
-        </div>
-      </div>
-    </div>
-  );
+interface NewsItem {
+  headline: string;
+  ticker?: string;
+  sector?: string;
+  timestamp: string;
+  bias: 'bullish' | 'bearish';
 }
 
-interface StatBlockProps {
-  label: string;
-  value: number;
-  change?: number;
-  changePercent?: number;
-  showSign?: boolean;
-}
+export default function Dashboard() {
+  const { user } = useAuth();
+  const [news, setNews] = useState<NewsItem[]>([]);
+  const [stats, setStats] = useState({
+    netWorth: 51957.46,
+    cashBalance: 45678.32,
+    portfolioValue: 6279.14,
+    todayPnL: 58.14
+  });
 
-function StatBlock({ label, value, change, changePercent, showSign }: StatBlockProps) {
-  const isProfit = (change ?? 0) >= 0;
-  return (
-    <div className="flex-1 flex flex-col justify-center px-6">
-      <div className="text-[10px] font-semibold uppercase tracking-wider mb-1"
-        style={{ fontFamily: 'var(--font-ui)', color: 'var(--text-muted)' }}>
-        {label}
-      </div>
-      <div className="flex items-center gap-3">
-        <span className="text-xl font-medium tabular-nums"
-          style={{ fontFamily: 'var(--font-mono)', color: 'var(--text-primary)' }}>
-          {showSign && value >= 0 ? '+' : ''}${value.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-        </span>
-        {change !== undefined && changePercent !== undefined && (
-          <div className="flex items-center gap-1">
-            {isProfit
-              ? <TrendingUp className="w-3 h-3" style={{ color: 'var(--accent)' }} />
-              : <TrendingDown className="w-3 h-3" style={{ color: 'var(--red)' }} />}
-            <span className="text-[11px] font-medium tabular-nums"
-              style={{ fontFamily: 'var(--font-mono)', color: isProfit ? 'var(--accent)' : 'var(--red)' }}>
-              {isProfit ? '+' : ''}{changePercent.toFixed(2)}%
-            </span>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
+  // WebSocket for live news
+  useEffect(() => {
+    const ws = new WebSocket('ws://localhost:8000/ws');
 
-function RecentTransactions() {
-  const navigate = useNavigate();
-  const transactions = [
-    { type: 'BUY',  symbol: 'AAPL',  company: 'Apple Inc.',      qty: 10, amount: 1784.50, pl: 32.50,  timestamp: '2h ago' },
-    { type: 'SELL', symbol: 'GOOGL', company: 'Alphabet Inc.',    qty: 5,  amount: 713.40,  pl: -28.20, timestamp: '5h ago' },
-    { type: 'BUY',  symbol: 'MSFT',  company: 'Microsoft Corp.',  qty: 8,  amount: 3321.84, pl: 77.84,  timestamp: '1d ago' },
-    { type: 'BUY',  symbol: 'NVDA',  company: 'NVIDIA Corp.',     qty: 3,  amount: 2635.35, pl: 145.20, timestamp: '2d ago' },
+    ws.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      if (data.news) {
+        setNews(data.news);
+      }
+    };
+
+    return () => ws.close();
+  }, []);
+
+  // Fetch portfolio stats
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const response = await fetch(`${API_BASE}/api/portfolio`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        const data = await response.json();
+        
+        const cashINR = data.cash * USD_TO_INR;
+        const portfolioValueINR = (data.total_value - data.cash) * USD_TO_INR;
+        const netWorthINR = data.total_value * USD_TO_INR;
+
+        setStats({
+          netWorth: netWorthINR,
+          cashBalance: cashINR,
+          portfolioValue: portfolioValueINR,
+          todayPnL: 58.14 // Mock for now
+        });
+      } catch (error) {
+        console.error('Failed to fetch stats:', error);
+      }
+    };
+
+    fetchStats();
+  }, []);
+
+  const recentActivity = [
+    { type: 'BUY', symbol: 'AAPL', shares: 10, price: 14900.57, time: '4h ago' },
+    { type: 'SELL', symbol: 'GOOGL', shares: 5, price: 11716.72, time: '5h ago' },
+    { type: 'BUY', symbol: 'MSFT', shares: 8, price: 34669.2, time: '1d ago' },
+    { type: 'BUY', symbol: 'NVDA', shares: 3, price: 73342.23, time: '2d ago' },
   ];
 
   return (
-    <div className="rounded-lg border p-4" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-dim)' }}>
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-[13px] font-bold" style={{ fontFamily: 'var(--font-heading)', color: 'var(--text-primary)' }}>
-          Recent Activity
-        </h3>
-        <button onClick={() => navigate('/transactions')} className="text-[11px] font-medium"
-          style={{ fontFamily: 'var(--font-ui)', color: 'var(--accent)', background: 'none', border: 'none', cursor: 'pointer' }}>
-          View All →
-        </button>
-      </div>
-      <div className="space-y-2">
-        {transactions.map((tx, index) => {
-          const isBuy = tx.type === 'BUY';
-          const isProfit = tx.pl >= 0;
-          return (
-            <div key={index} className="flex items-center gap-3 p-2 rounded-md"
-              style={{ backgroundColor: 'var(--bg-elevated)' }}>
-              <div className="px-2 py-0.5 rounded text-[9px] font-bold"
-                style={{ fontFamily: 'var(--font-ui)', backgroundColor: isBuy ? 'var(--accent-dim)' : 'var(--red-dim)', color: isBuy ? 'var(--accent)' : 'var(--red)' }}>
-                {tx.type}
+    <div className="min-h-screen bg-background">
+      <TopBar />
+      
+      <main className="pt-16">
+        <div className="container mx-auto px-6 py-8">
+          {/* Stats Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div className="bg-card rounded-lg p-6 border border-border">
+              <div className="flex items-center justify-between mb-2">
+                <p className="text-sm text-muted-foreground">Net Worth</p>
+                <DollarSign className="w-5 h-5 text-primary" />
               </div>
-              <div className="flex-1 min-w-0">
-                <div className="text-[13px] font-semibold tabular-nums" style={{ fontFamily: 'var(--font-mono)', color: 'var(--text-primary)' }}>
-                  {tx.symbol}
-                </div>
-                <div className="text-[11px] truncate" style={{ fontFamily: 'var(--font-ui)', color: 'var(--text-muted)' }}>
-                  x{tx.qty} shares
+              <p className="text-3xl font-bold text-foreground">₹{stats.netWorth.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</p>
+              <p className="text-xs text-green-500 mt-1">+0.93%</p>
+            </div>
+
+            <div className="bg-card rounded-lg p-6 border border-border">
+              <div className="flex items-center justify-between mb-2">
+                <p className="text-sm text-muted-foreground">Cash Balance</p>
+                <Wallet className="w-5 h-5 text-primary" />
+              </div>
+              <p className="text-3xl font-bold text-foreground">₹{stats.cashBalance.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</p>
+            </div>
+
+            <div className="bg-card rounded-lg p-6 border border-border">
+              <div className="flex items-center justify-between mb-2">
+                <p className="text-sm text-muted-foreground">Portfolio Value</p>
+                <PieChart className="w-5 h-5 text-primary" />
+              </div>
+              <p className="text-3xl font-bold text-foreground">₹{stats.portfolioValue.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</p>
+            </div>
+
+            <div className="bg-card rounded-lg p-6 border border-border">
+              <div className="flex items-center justify-between mb-2">
+                <p className="text-sm text-muted-foreground">Today P/L</p>
+                <TrendingUp className="w-5 h-5 text-green-500" />
+              </div>
+              <p className="text-3xl font-bold text-green-500">+₹{stats.todayPnL.toFixed(2)}</p>
+              <p className="text-xs text-green-500 mt-1">+0.93%</p>
+            </div>
+          </div>
+
+          {/* Main Content - Recent Activity + Live News */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Recent Activity - LEFT (2/3 width) */}
+            <div className="lg:col-span-2 bg-card rounded-lg border border-border">
+              <div className="p-6 border-b border-border">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
+                    <Activity className="w-5 h-5 text-primary" />
+                    Recent Activity
+                  </h2>
+                  <button className="text-sm text-primary hover:underline">View All →</button>
                 </div>
               </div>
-              <div className="text-right">
-                <div className="text-[13px] font-medium tabular-nums" style={{ fontFamily: 'var(--font-mono)', color: 'var(--text-primary)' }}>
-                  ${tx.amount.toLocaleString('en-US', { minimumFractionDigits: 2 })}
-                </div>
-                <div className="text-[11px] font-medium tabular-nums" style={{ fontFamily: 'var(--font-mono)', color: isProfit ? 'var(--accent)' : 'var(--red)' }}>
-                  {isProfit ? '+' : ''}${Math.abs(tx.pl).toFixed(2)}
-                </div>
-              </div>
-              <div className="text-[11px] w-12 text-right" style={{ fontFamily: 'var(--font-ui)', color: 'var(--text-muted)' }}>
-                {tx.timestamp}
+
+              <div className="divide-y divide-border">
+                {recentActivity.map((activity, i) => (
+                  <div key={i} className="p-4 hover:bg-accent/30 transition">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
+                          activity.type === 'BUY' ? 'bg-green-500/10' : 'bg-red-500/10'
+                        }`}>
+                          {activity.type === 'BUY' ? (
+                            <TrendingUp className="w-5 h-5 text-green-500" />
+                          ) : (
+                            <TrendingDown className="w-5 h-5 text-red-500" />
+                          )}
+                        </div>
+                        <div>
+                          <p className="font-semibold text-foreground">
+                            {activity.type} {activity.symbol}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            x{activity.shares} shares
+                          </p>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <p className="font-semibold text-foreground">
+                          ₹{activity.price.toLocaleString('en-IN')}
+                        </p>
+                        <p className="text-xs text-muted-foreground">{activity.time}</p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
-          );
-        })}
-      </div>
+
+            {/* Live News Headlines - RIGHT (1/3 width) */}
+            <div className="bg-card rounded-lg border border-border">
+              <div className="p-6 border-b border-border">
+                <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
+                  <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+                  Live News
+                </h2>
+              </div>
+
+              <div className="divide-y divide-border max-h-[600px] overflow-y-auto">
+                {news.length > 0 ? (
+                  news.map((item, i) => (
+                    <div key={i} className="p-4 hover:bg-accent/30 transition">
+                      <div className="flex items-start gap-2 mb-2">
+                        <span className={`px-2 py-0.5 rounded text-xs font-medium ${
+                          item.bias === 'bullish' 
+                            ? 'bg-green-500/10 text-green-500' 
+                            : 'bg-red-500/10 text-red-500'
+                        }`}>
+                          {item.bias === 'bullish' ? '📈' : '📉'}
+                        </span>
+                        {item.ticker && (
+                          <span className="px-2 py-0.5 rounded text-xs font-medium bg-primary/10 text-primary">
+                            {item.ticker}
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-sm text-foreground leading-relaxed mb-2">
+                        {item.headline}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {new Date(item.timestamp).toLocaleTimeString()}
+                      </p>
+                    </div>
+                  ))
+                ) : (
+                  <div className="p-6 text-center text-muted-foreground text-sm">
+                    Waiting for live news...
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
     </div>
   );
 }

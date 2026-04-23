@@ -2,7 +2,7 @@ import { Zap } from 'lucide-react';
 import { mockNews } from '../data/mockData';
 import { useState } from 'react';
 
-export function News() {
+export default function News() {
   const [expandedNews, setExpandedNews] = useState<string | null>(null);
 
   const getSentimentStyle = (sentiment: string) => {

@@ -14,13 +14,14 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from pydantic import BaseModel
 from jose import jwt, JWTError
 from passlib.context import CryptContext
+from fastapi import Form
 
 # ──────────────────────────── CONFIG ────────────────────────────
 SECRET_KEY = os.getenv("SECRET_KEY", "actually-secret-key-change-in-prod-2026")
 ALGORITHM = "HS256"
 TOKEN_EXPIRE_HOURS = 24
 DB_PATH = os.path.join(os.path.dirname(__file__), "actually.db")
-INITIAL_CASH = 50_000.0
+INITIAL_CASH = 598.80
 TICK_INTERVAL = 2        # seconds between price updates
 NEWS_INTERVAL = 45       # seconds between news headlines
 NEWS_BIAS_DURATION = 180  # seconds a news bias lasts (3 minutes)
@@ -370,15 +371,16 @@ def register(req: AuthRequest):
     finally:
         conn.close()
 
+
 @app.post("/api/login")
-def login(req: AuthRequest):
+def login(username: str = Form(), password: str = Form()):
     conn = get_db()
-    row = conn.execute("SELECT * FROM users WHERE username = ?", (req.username,)).fetchone()
+    row = conn.execute("SELECT * FROM users WHERE username = ?", (username,)).fetchone()
     conn.close()
-    if not row or not pwd_ctx.verify(req.password, row["password_hash"]):
+    if not row or not pwd_ctx.verify(password, row["password_hash"]):
         raise HTTPException(401, "Invalid credentials")
     token = create_token(row["id"], row["username"])
-    return {"token": token, "username": row["username"], "cash": row["cash"]}
+    return {"access_token": token, "token_type": "bearer", "username": row["username"], "cash": row["cash"]}
 
 @app.get("/api/me")
 def get_me(user=Depends(verify_token)):

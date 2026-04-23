@@ -27,8 +27,6 @@ export function Sidebar() {
     {
       label: 'TRADING',
       items: [
-        { path: '/trade', label: 'Buy/Sell', icon: ShoppingCart },
-        { path: '/watchlist', label: 'Watchlist', icon: Eye },
         { path: '/transactions', label: 'Transactions', icon: Receipt },
       ]
     },

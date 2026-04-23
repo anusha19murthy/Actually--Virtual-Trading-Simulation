@@ -1,6 +1,6 @@
 import { User, Mail, Calendar, Shield, Award, Target } from 'lucide-react';
 
-export function Profile() {
+export default function Profile() {
   return (
     <div className="p-6 h-full overflow-y-auto">
       {/* Page Header */}
