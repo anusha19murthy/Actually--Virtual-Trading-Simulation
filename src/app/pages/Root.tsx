@@ -3,6 +3,7 @@ import { Sidebar } from '../components/Sidebar';
 import TopBar from '../components/TopBar';
 import { useAuth } from '../context/AuthContext';
 import { Loader2 } from 'lucide-react';
+import LandingPage from './LandingPage';
 
 // Inner layout shown when user is logged in
 function AppLayout() {
@@ -35,7 +36,7 @@ export default function Root() {
   }
 
   if (!user) {
-    return <Navigate to="/login" replace />;
+    return <LandingPage />;
   }
 
   return <AppLayout />;

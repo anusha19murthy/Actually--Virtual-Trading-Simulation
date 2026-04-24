@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { TrendingUp, TrendingDown, DollarSign, Wallet, PieChart, Activity } from 'lucide-react';
+import { useNavigate } from 'react-router';
 import TopBar from '../components/TopBar';
 import { useAuth } from '../context/AuthContext';
 
@@ -16,6 +17,7 @@ interface NewsItem {
 
 export default function Dashboard() {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [news, setNews] = useState<NewsItem[]>([]);
   const [stats, setStats] = useState({
     netWorth: 51957.46,
@@ -126,7 +128,7 @@ export default function Dashboard() {
                     <Activity className="w-5 h-5 text-primary" />
                     Recent Activity
                   </h2>
-                  <button className="text-sm text-primary hover:underline">View All →</button>
+                  <button onClick={() => navigate('/transactions')} className="text-sm text-primary hover:text-primary/80 transition">View All →</button>
                 </div>
               </div>
 

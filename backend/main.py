@@ -351,6 +351,10 @@ class TradeRequest(BaseModel):
     ticker: str
     shares: int
 
+class ChangePasswordRequest(BaseModel):
+    current_password: str
+    new_password: str
+
 # ──────────────────────────── AUTH ROUTES ─────────────────────────
 
 @app.post("/api/register")
@@ -485,6 +489,32 @@ def sell_stock(req: TradeRequest, user=Depends(verify_token)):
     new_cash = conn.execute("SELECT cash FROM users WHERE id = ?", (user["user_id"],)).fetchone()["cash"]
     conn.close()
     return {"message": f"Sold {req.shares} shares of {req.ticker} at ${price:.2f}", "cash": round(new_cash, 2)}
+
+# ──────────────────────────── ACCOUNT MANAGEMENT ─────────────────
+
+@app.post("/api/change-password")
+def change_password(req: ChangePasswordRequest, user=Depends(verify_token)):
+    if len(req.new_password) < 4:
+        raise HTTPException(400, "New password must be at least 4 characters")
+    conn = get_db()
+    row = conn.execute("SELECT password_hash FROM users WHERE id = ?", (user["user_id"],)).fetchone()
+    if not row or not pwd_ctx.verify(req.current_password, row["password_hash"]):
+        conn.close()
+        raise HTTPException(400, "Current password is incorrect")
+    new_hash = pwd_ctx.hash(req.new_password)
+    conn.execute("UPDATE users SET password_hash = ? WHERE id = ?", (new_hash, user["user_id"]))
+    conn.commit()
+    conn.close()
+    return {"message": "Password changed successfully"}
+
+@app.post("/api/reset-portfolio")
+def reset_portfolio(user=Depends(verify_token)):
+    conn = get_db()
+    conn.execute("DELETE FROM positions WHERE user_id = ?", (user["user_id"],))
+    conn.execute("UPDATE users SET cash = ? WHERE id = ?", (INITIAL_CASH, user["user_id"]))
+    conn.commit()
+    conn.close()
+    return {"message": "Portfolio reset successfully", "cash": INITIAL_CASH}
 
 # ──────────────────────────── STOCK INFO (WIKIPEDIA) ─────────────
 

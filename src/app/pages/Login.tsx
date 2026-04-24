@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { useNavigate } from 'react-router';
+import { useNavigate, Navigate } from 'react-router';
 import { TrendingUp, Eye, EyeOff, Loader2 } from 'lucide-react';
 
 export default function Login() {
-  const { login, register } = useAuth();
+  const { login, register, user } = useAuth();
   const navigate = useNavigate();
+  if (user) return <Navigate to="/" replace />;
 
   const [mode, setMode] = useState<'login' | 'register'>('login');
   const [username, setUsername] = useState('');
