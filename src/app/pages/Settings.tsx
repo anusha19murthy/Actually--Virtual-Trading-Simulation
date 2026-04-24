@@ -147,7 +147,7 @@ function ResetPortfolioModal({ onClose }: { onClose: () => void }) {
             <div className="w-12 h-12 bg-green-500/10 rounded-full flex items-center justify-center mx-auto mb-3">
               <span className="text-2xl">✓</span>
             </div>
-            <p className="text-green-500 font-medium">Portfolio reset to ₹50,000!</p>
+            <p className="text-green-500 font-medium">Portfolio reset to ₹1,00,000!</p>
           </div>
         ) : (
           <>
@@ -302,7 +302,7 @@ export default function Settings() {
             >
               <div className="text-left">
                 <p className="font-medium text-red-500">Reset Portfolio</p>
-                <p className="text-xs text-muted-foreground">Reset all trades and start fresh with ₹50,000</p>
+                <p className="text-xs text-muted-foreground">Reset all trades and start fresh with ₹1,00,000</p>
               </div>
               <span className="text-red-500/70">→</span>
             </button>
