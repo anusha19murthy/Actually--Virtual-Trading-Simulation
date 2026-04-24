@@ -3,7 +3,7 @@ import { User, Calendar, Award, Target, X, Loader2 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router';
 
-const API_BASE = 'http://localhost:8000';
+import { API_BASE } from '../../config';
 
 interface TradingStats {
   total_trades: number;

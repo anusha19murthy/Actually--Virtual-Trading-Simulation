@@ -5,7 +5,8 @@ import TopBar from '../components/TopBar';
 import { useAuth } from '../context/AuthContext';
 
 const USD_TO_INR = 83.5;
-const API_BASE = 'http://localhost:8000';
+import { API_BASE, WS_BASE } from '../../config';
+const ws = new WebSocket(`${WS_BASE}/ws`);
 
 interface NewsItem {
   headline: string;

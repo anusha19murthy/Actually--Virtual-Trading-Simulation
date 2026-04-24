@@ -5,7 +5,7 @@ import TopBar from '../components/TopBar';
 import { useTheme } from '../context/ThemeContext';
 import { useAuth } from '../context/AuthContext';
 
-const API_BASE = 'http://localhost:8000';
+import { API_BASE } from '../../config';
 
 // ── Change Password Modal ──────────────────────────────────────────
 function ChangePasswordModal({ onClose }: { onClose: () => void }) {
