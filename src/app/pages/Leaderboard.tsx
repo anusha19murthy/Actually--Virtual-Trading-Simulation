@@ -69,7 +69,7 @@ export default function Leaderboard() {
             </p>
           </div>
           <div className="text-right">
-            <p className="text-[11px]" style={{ color: 'var(--text-muted)', fontFamily: 'var(--font-ui)' }}>Net Worth</p>
+            <p className="text-[11px]" style={{ color: 'var(--text-secondary)', fontFamily: 'var(--font-ui)' }}>Net Worth</p>
             <p className="text-[15px] font-bold tabular-nums" style={{ fontFamily: 'var(--font-mono)', color: 'var(--text-primary)' }}>
               ₹{(currentUser.netWorth / 100000).toFixed(2)}L
             </p>

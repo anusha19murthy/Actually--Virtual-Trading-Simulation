@@ -148,7 +148,7 @@ export default function Dashboard() {
                           <p className="font-semibold text-foreground">
                             {activity.type} {activity.symbol}
                           </p>
-                          <p className="text-xs text-muted-foreground">
+                          <p className="text-xs text-foreground/60">
                             x{activity.shares} shares
                           </p>
                         </div>
@@ -157,7 +157,7 @@ export default function Dashboard() {
                         <p className="font-semibold text-foreground">
                           ₹{activity.price.toLocaleString('en-IN')}
                         </p>
-                        <p className="text-xs text-muted-foreground">{activity.time}</p>
+                        <p className="text-xs text-foreground/60">{activity.time}</p>
                       </div>
                     </div>
                   </div>

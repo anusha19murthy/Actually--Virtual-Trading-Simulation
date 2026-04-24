@@ -76,7 +76,7 @@ function TradeModal({ stock, onClose, onTrade, userHoldings }: TradeModalProps) 
             onClick={() => setAction('buy')}
             className={`flex-1 py-2 px-4 rounded-lg font-medium transition ${action === 'buy'
                 ? 'bg-green-500 text-white'
-                : 'bg-background text-muted-foreground hover:text-foreground'
+                : 'bg-background text-foreground/50 hover:text-foreground border border-border'
               }`}
           >
             BUY
@@ -85,7 +85,7 @@ function TradeModal({ stock, onClose, onTrade, userHoldings }: TradeModalProps) 
             onClick={() => setAction('sell')}
             className={`flex-1 py-2 px-4 rounded-lg font-medium transition ${action === 'sell'
                 ? 'bg-red-500 text-white'
-                : 'bg-background text-muted-foreground hover:text-foreground'
+                : 'bg-background text-foreground/50 hover:text-foreground border border-border'
               }`}
           >
             SELL
@@ -333,7 +333,7 @@ export default function Markets() {
                   </td>
                   <td className="px-6 py-4 text-sm text-foreground">{stock.name}</td>
                   <td className="px-6 py-4">
-                    <span className="inline-block px-2 py-1 text-xs rounded bg-accent text-muted-foreground">
+                    <span className="inline-block px-2 py-1 text-xs rounded bg-accent text-foreground">
                       {stock.sector}
                     </span>
                   </td>
