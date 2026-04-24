@@ -70,7 +70,7 @@ export default function Landing() {
         
         <p className="text-lg md:text-xl text-gray-500 mb-12 leading-relaxed max-w-2xl mx-auto font-medium">
           Losing money in the real world is devastating. Here, it's the curriculum.<br />
-          Experience the brutal reality of trading with <span className="font-bold text-gray-800">$50,000</span> in virtual cash. Make mistakes, blow up your portfolio, and build your intuition.
+          Experience the brutal reality of trading with <span className="font-bold text-gray-800">₹ 1,00,000</span> in virtual cash. Make mistakes, blow up your portfolio, and build your intuition.
         </p>
         
         <div className="flex flex-col sm:flex-row items-center justify-center gap-5">
