@@ -29,7 +29,7 @@ export default function Dashboard() {
 
   // WebSocket for live news
   useEffect(() => {
-    const ws = new WebSocket('ws://localhost:8000/ws');
+    const ws = new WebSocket(`${WS_BASE}/ws`);
 
     ws.onmessage = (event) => {
       const data = JSON.parse(event.data);
