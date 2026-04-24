@@ -4,7 +4,7 @@ import TopBar from '../components/TopBar';
 import { useTheme } from '../context/ThemeContext';
 
 export default function Settings() {
-  const { theme } = useTheme();
+  const { theme, setTheme } = useTheme();
 
   return (
     <div className="min-h-screen bg-background">
@@ -26,8 +26,8 @@ export default function Settings() {
               <label className="text-sm text-muted-foreground mb-3 block">Theme</label>
               <div className="grid grid-cols-2 gap-3">
                 <button
-                  onClick={() => {}}
-                  className={`p-4 rounded-lg border-2 transition cursor-not-allowed opacity-60 ${
+                  onClick={() => setTheme('dark')}
+                  className={`p-4 rounded-lg border-2 transition ${
                     theme === 'dark'
                       ? 'border-primary bg-primary/10'
                       : 'border-border bg-accent/50'
@@ -37,8 +37,8 @@ export default function Settings() {
                   <p className="text-sm font-medium">Dark</p>
                 </button>
                 <button
-                  onClick={() => {}}
-                  className={`p-4 rounded-lg border-2 transition cursor-not-allowed opacity-60 ${
+                  onClick={() => setTheme('light')}
+                  className={`p-4 rounded-lg border-2 transition ${
                     theme === 'light'
                       ? 'border-primary bg-primary/10'
                       : 'border-border bg-accent/50'

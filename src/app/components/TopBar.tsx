@@ -125,7 +125,7 @@ export default function TopBar() {
             <div className="hidden sm:block">
               <p className="text-xs text-muted-foreground leading-none mb-0.5">Wallet</p>
               <p className="text-sm font-semibold text-foreground leading-none">
-                ₹{user ? user.cash.toLocaleString('en-IN', { maximumFractionDigits: 2 }) : '0.00'}
+                ₹{user ? (user.cash * 83.5).toLocaleString('en-IN', { maximumFractionDigits: 2 }) : '0.00'}
               </p>
             </div>
           </div>

@@ -1,19 +1,21 @@
-import { 
-  LayoutDashboard, 
-  Briefcase, 
-  TrendingUp, 
-  ShoppingCart, 
-  Eye, 
-  Receipt, 
-  User, 
-  Settings, 
+import {
+  LayoutDashboard,
+  Briefcase,
+  TrendingUp,
+  ShoppingCart,
+  Eye,
+  Receipt,
+  User,
+  Settings,
   Trophy,
-  LogOut 
+  LogOut
 } from 'lucide-react';
 import { Link, useLocation } from 'react-router';
+import { useAuth } from '../context/AuthContext';
 
 export function Sidebar() {
   const location = useLocation();
+  const { user, logout } = useAuth();
 
   const navSections = [
     {
@@ -155,28 +157,28 @@ export function Sidebar() {
       <div className="p-3 border-t" style={{ borderColor: 'var(--border-dim)' }}>
         <div className="flex items-center gap-2 p-2 rounded-lg mb-2">
           {/* Avatar */}
-          <div 
+          <div
             className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-semibold"
-            style={{ 
+            style={{
               backgroundColor: 'var(--accent)',
               color: 'var(--bg-card)',
               fontFamily: 'var(--font-ui)'
             }}
           >
-            JD
+            {user?.username?.charAt(0).toUpperCase() || 'U'}
           </div>
-          
+
           {/* User info */}
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-1">
-              <span 
+              <span
                 className="text-xs font-semibold truncate"
-                style={{ 
+                style={{
                   fontFamily: 'var(--font-ui)',
                   color: 'var(--text-primary)'
                 }}
               >
-                John Doe
+                {user?.username || 'User'}
               </span>
               <span 
                 className="text-[10px] font-medium tabular-nums"
@@ -205,7 +207,8 @@ export function Sidebar() {
         </div>
 
         {/* Logout button */}
-        <button 
+        <button
+          onClick={logout}
           className="flex items-center gap-2 w-full h-9 px-3 rounded-lg text-[13px] font-medium"
           style={{
             fontFamily: 'var(--font-ui)',

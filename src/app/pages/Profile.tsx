@@ -1,6 +1,8 @@
 import { User, Mail, Calendar, Shield, Award, Target } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 
 export default function Profile() {
+  const { user } = useAuth();
   return (
     <div className="p-6 h-full overflow-y-auto">
       {/* Page Header */}
@@ -39,22 +41,22 @@ export default function Profile() {
             <div className="flex flex-col items-center">
               <div 
                 className="w-20 h-20 rounded-full flex items-center justify-center mb-4 text-sm font-semibold"
-                style={{ 
+                style={{
                   backgroundColor: 'var(--accent)',
                   color: 'var(--bg-card)',
                   fontFamily: 'var(--font-ui)'
                 }}
               >
-                JI
+                {user?.username?.charAt(0).toUpperCase() || 'U'}
               </div>
-              <h3 
+              <h3
                 className="text-lg font-bold mb-2"
-                style={{ 
+                style={{
                   fontFamily: 'var(--font-heading)',
                   color: 'var(--text-primary)'
                 }}
               >
-                John Investor
+                {user?.username || 'User'}
               </h3>
               <div 
                 className="px-3 py-1 rounded-full mb-4 text-xs font-medium tabular-nums"
@@ -176,7 +178,7 @@ export default function Profile() {
                       color: 'var(--text-primary)'
                     }}
                   >
-                    John Investor
+                    {user?.username || 'User'}
                   </p>
                 </div>
               </div>

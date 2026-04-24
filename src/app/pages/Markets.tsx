@@ -33,7 +33,7 @@ function TradeModal({ stock, onClose, onTrade, userHoldings }: TradeModalProps) 
   const availableShares = userHoldings[stock.ticker] || 0;
 
   const canSell = availableShares >= quantity;
-  const canBuy = user && user.cash >= totalCost;
+  const canBuy = user && (user.cash * USD_TO_INR) >= totalCost;
 
   const handleTrade = () => {
     if (action === 'sell' && !canSell) {
@@ -189,8 +189,8 @@ export default function Markets() {
         holdings[pos.ticker] = pos.shares;
       });
       setUserHoldings(holdings);
-    } catch (error) {
-      console.error('Failed to fetch holdings:', error);
+    } catch {
+      // holdings fetch failed silently
     }
   };
 
@@ -198,7 +198,6 @@ export default function Markets() {
     const ws = new WebSocket('ws://localhost:8000/ws');
 
     ws.onopen = () => {
-      console.log('WebSocket connected');
       setWsConnected(true);
     };
 
@@ -209,12 +208,10 @@ export default function Markets() {
     };
 
     ws.onclose = () => {
-      console.log('WebSocket disconnected');
       setWsConnected(false);
     };
 
-    ws.onerror = (error) => {
-      console.error('WebSocket error:', error);
+    ws.onerror = () => {
       setWsConnected(false);
     };
 
@@ -258,8 +255,7 @@ export default function Markets() {
       } else {
         alert(data.detail || 'Trade failed');
       }
-    } catch (error) {
-      console.error('Trade error:', error);
+    } catch {
       alert('Trade failed');
     }
   };

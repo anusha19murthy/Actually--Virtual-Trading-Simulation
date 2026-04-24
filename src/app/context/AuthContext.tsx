@@ -47,8 +47,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         localStorage.removeItem('token');
         setUser(null);
       }
-    } catch (error) {
-      console.error('Failed to refresh user:', error);
+    } catch {
       localStorage.removeItem('token');
       setUser(null);
     }

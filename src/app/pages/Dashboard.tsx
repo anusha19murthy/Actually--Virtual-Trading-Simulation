@@ -58,8 +58,8 @@ export default function Dashboard() {
           portfolioValue: portfolioValueINR,
           todayPnL: 58.14 // Mock for now
         });
-      } catch (error) {
-        console.error('Failed to fetch stats:', error);
+      } catch {
+        // stats fetch failed silently
       }
     };
 
