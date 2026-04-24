@@ -194,7 +194,7 @@ export default function Login() {
           {/* Info */}
           {mode === 'register' && (
             <p className="text-[11px] text-center mt-4" style={{ color: 'var(--text-muted)', fontFamily: 'var(--font-ui)' }}>
-              You'll start with <span style={{ color: 'var(--accent)' }}>₹50,000 virtual cash</span> to trade with
+              You'll start with <span style={{ color: 'var(--accent)' }}>₹1,00,000 virtual cash</span> to trade with
             </p>
           )}
         </div>
