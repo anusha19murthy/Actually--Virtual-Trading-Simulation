@@ -153,7 +153,7 @@ function ResetPortfolioModal({ onClose }: { onClose: () => void }) {
           <>
             <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-4 mb-5">
               <p className="text-sm font-semibold text-red-500 mb-1">⚠️ This action cannot be undone</p>
-              <p className="text-xs text-foreground/70">All your holdings will be sold and your cash will be reset to <strong>₹50,000</strong>. Your trade history will be cleared.</p>
+              <p className="text-xs text-foreground/70">All your holdings will be sold and your cash will be reset to <strong>₹1,00,000</strong>. Your trade history will be cleared.</p>
             </div>
 
             <div className="flex gap-3">
