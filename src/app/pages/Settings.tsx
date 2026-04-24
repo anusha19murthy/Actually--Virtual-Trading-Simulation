@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Moon, Sun, Globe, Bell, Shield, Database, User, X, Loader2, Eye, EyeOff } from 'lucide-react';
+import { Moon, Sun, Globe, Bell, Database, User, X, Loader2, Eye, EyeOff } from 'lucide-react';
 import { useNavigate } from 'react-router';
 import TopBar from '../components/TopBar';
 import { useTheme } from '../context/ThemeContext';
@@ -305,26 +305,6 @@ export default function Settings() {
                 <p className="text-xs text-muted-foreground">Reset all trades and start fresh with ₹50,000</p>
               </div>
               <span className="text-red-500/70">→</span>
-            </button>
-          </div>
-        </div>
-
-        {/* Security */}
-        <div className="bg-card rounded-lg p-6 border border-border mb-6">
-          <div className="flex items-center gap-2 mb-4">
-            <Shield className="w-5 h-5 text-primary" />
-            <h2 className="text-lg font-semibold text-foreground">Security</h2>
-          </div>
-          <div className="space-y-3">
-            <div className="flex items-center justify-between px-4 py-3 bg-background rounded-lg">
-              <div className="text-left">
-                <p className="text-sm font-medium text-foreground">Two-Factor Authentication</p>
-                <p className="text-xs text-muted-foreground">Add extra security to your account</p>
-              </div>
-              <span className="text-xs text-red-500 font-medium">Not Enabled</span>
-            </div>
-            <button className="w-full text-left px-4 py-3 bg-background rounded-lg hover:bg-accent transition text-sm text-foreground">
-              Manage Sessions
             </button>
           </div>
         </div>

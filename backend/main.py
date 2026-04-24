@@ -37,12 +37,19 @@ def get_db():
 
 def init_db():
     conn = get_db()
+    # Migrate: add display_name if it doesn't exist on older DBs
+    try:
+        conn.execute("ALTER TABLE users ADD COLUMN display_name TEXT")
+        conn.commit()
+    except Exception:
+        pass
     conn.executescript("""
         CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             username TEXT UNIQUE NOT NULL,
             password_hash TEXT NOT NULL,
-            cash REAL DEFAULT 50000.0
+            cash REAL DEFAULT 50000.0,
+            display_name TEXT
         );
         CREATE TABLE IF NOT EXISTS positions (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -389,11 +396,12 @@ def login(username: str = Form(), password: str = Form()):
 @app.get("/api/me")
 def get_me(user=Depends(verify_token)):
     conn = get_db()
-    row = conn.execute("SELECT cash FROM users WHERE id = ?", (user["user_id"],)).fetchone()
+    row = conn.execute("SELECT cash, display_name FROM users WHERE id = ?", (user["user_id"],)).fetchone()
     conn.close()
     if not row:
         raise HTTPException(404, "User not found")
-    return {"username": user["username"], "cash": row["cash"]}
+    display = row["display_name"] if row["display_name"] else user["username"]
+    return {"username": display, "cash": row["cash"]}
 
 # ──────────────────────────── PORTFOLIO ROUTES ───────────────────
 
@@ -515,6 +523,50 @@ def reset_portfolio(user=Depends(verify_token)):
     conn.commit()
     conn.close()
     return {"message": "Portfolio reset successfully", "cash": INITIAL_CASH}
+
+@app.get("/api/stats")
+def get_stats(user=Depends(verify_token)):
+    conn = get_db()
+    positions = conn.execute(
+        "SELECT ticker, shares, avg_price FROM positions WHERE user_id = ?",
+        (user["user_id"],)
+    ).fetchall()
+    conn.close()
+
+    total_trades = len(positions)
+    successful = 0
+    for p in positions:
+        current_price = engine.get_price(p["ticker"])
+        if current_price > p["avg_price"]:
+            successful += 1
+
+    win_rate = round((successful / total_trades * 100), 1) if total_trades > 0 else 0.0
+    return {
+        "total_trades": total_trades,
+        "successful_trades": successful,
+        "trading_days": total_trades,  # approx: one day per holding
+        "win_rate": win_rate,
+    }
+
+class UpdateProfileRequest(BaseModel):
+    display_name: str
+
+@app.post("/api/update-profile")
+def update_profile(req: UpdateProfileRequest, user=Depends(verify_token)):
+    name = req.display_name.strip()
+    if len(name) < 1:
+        raise HTTPException(400, "Display name cannot be empty")
+    conn = get_db()
+    # Ensure display_name column exists
+    try:
+        conn.execute("ALTER TABLE users ADD COLUMN display_name TEXT")
+        conn.commit()
+    except Exception:
+        pass  # column already exists
+    conn.execute("UPDATE users SET display_name = ? WHERE id = ?", (name, user["user_id"]))
+    conn.commit()
+    conn.close()
+    return {"message": "Profile updated", "display_name": name}
 
 # ──────────────────────────── STOCK INFO (WIKIPEDIA) ─────────────
 
