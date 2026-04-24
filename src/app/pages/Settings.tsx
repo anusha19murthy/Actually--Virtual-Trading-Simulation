@@ -27,7 +27,7 @@ export default function Settings() {
               <div className="grid grid-cols-2 gap-3">
                 <button
                   onClick={() => {}}
-                  className={`p-4 rounded-lg border-2 transition ${
+                  className={`p-4 rounded-lg border-2 transition cursor-not-allowed opacity-60 ${
                     theme === 'dark'
                       ? 'border-primary bg-primary/10'
                       : 'border-border bg-accent/50'
@@ -38,7 +38,7 @@ export default function Settings() {
                 </button>
                 <button
                   onClick={() => {}}
-                  className={`p-4 rounded-lg border-2 transition ${
+                  className={`p-4 rounded-lg border-2 transition cursor-not-allowed opacity-60 ${
                     theme === 'light'
                       ? 'border-primary bg-primary/10'
                       : 'border-border bg-accent/50'
@@ -60,16 +60,6 @@ export default function Settings() {
           </div>
 
           <div className="space-y-4">
-            <div>
-              <label className="text-sm text-muted-foreground mb-2 block">Currency</label>
-              <p className="text-xs text-muted-foreground mb-2">Display currency for prices</p>
-              <select className="w-full px-4 py-2 bg-background border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary">
-                <option value="INR">₹ INR</option>
-                <option value="USD">$ USD</option>
-                <option value="EUR">€ EUR</option>
-              </select>
-            </div>
-
             <div>
               <label className="text-sm text-muted-foreground mb-2 block">Language</label>
               <p className="text-xs text-muted-foreground mb-2">App display language</p>

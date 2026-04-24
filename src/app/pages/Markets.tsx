@@ -74,21 +74,19 @@ function TradeModal({ stock, onClose, onTrade, userHoldings }: TradeModalProps) 
         <div className="flex gap-2 mb-6">
           <button
             onClick={() => setAction('buy')}
-            className={`flex-1 py-2 px-4 rounded-lg font-medium transition ${
-              action === 'buy'
+            className={`flex-1 py-2 px-4 rounded-lg font-medium transition ${action === 'buy'
                 ? 'bg-green-500 text-white'
                 : 'bg-background text-muted-foreground hover:text-foreground'
-            }`}
+              }`}
           >
             BUY
           </button>
           <button
             onClick={() => setAction('sell')}
-            className={`flex-1 py-2 px-4 rounded-lg font-medium transition ${
-              action === 'sell'
+            className={`flex-1 py-2 px-4 rounded-lg font-medium transition ${action === 'sell'
                 ? 'bg-red-500 text-white'
                 : 'bg-background text-muted-foreground hover:text-foreground'
-            }`}
+              }`}
           >
             SELL
           </button>
@@ -143,11 +141,10 @@ function TradeModal({ stock, onClose, onTrade, userHoldings }: TradeModalProps) 
         <button
           onClick={handleTrade}
           disabled={(action === 'sell' && !canSell) || (action === 'buy' && !canBuy)}
-          className={`w-full py-3 rounded-lg font-semibold transition ${
-            action === 'buy'
+          className={`w-full py-3 rounded-lg font-semibold transition ${action === 'buy'
               ? 'bg-green-500 hover:bg-green-600 text-white disabled:bg-green-500/50 disabled:cursor-not-allowed'
               : 'bg-red-500 hover:bg-red-600 text-white disabled:bg-red-500/50 disabled:cursor-not-allowed'
-          }`}
+            }`}
         >
           {action === 'buy' ? `Buy ${quantity} Shares` : `Sell ${quantity} Shares`}
         </button>
@@ -242,7 +239,7 @@ export default function Markets() {
     try {
       const token = localStorage.getItem('token');
       const endpoint = action === 'buy' ? '/api/buy' : '/api/sell';
-      
+
       const response = await fetch(`${API_BASE}${endpoint}`, {
         method: 'POST',
         headers: {
@@ -253,7 +250,7 @@ export default function Markets() {
       });
 
       const data = await response.json();
-      
+
       if (response.ok) {
         alert(`${action === 'buy' ? 'Bought' : 'Sold'} ${quantity} shares of ${ticker}`);
         refreshUser();
@@ -270,14 +267,13 @@ export default function Markets() {
   return (
     <div className="min-h-screen bg-background">
       <TopBar />
-      
+
       <main className="container mx-auto px-6 pt-24 pb-8">
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-2xl font-bold text-foreground">All Stocks</h1>
           <div className="flex items-center gap-2">
-            <span className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium ${
-              wsConnected ? 'bg-green-500/10 text-green-500' : 'bg-red-500/10 text-red-500'
-            }`}>
+            <span className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium ${wsConnected ? 'bg-green-500/10 text-green-500' : 'bg-red-500/10 text-red-500'
+              }`}>
               <span className={`w-2 h-2 rounded-full ${wsConnected ? 'bg-green-500 animate-pulse' : 'bg-red-500'}`}></span>
               {wsConnected ? 'Live' : 'Demo'}
             </span>
@@ -287,31 +283,28 @@ export default function Markets() {
         <div className="flex gap-2 mb-6">
           <button
             onClick={() => setFilter('all')}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
-              filter === 'all'
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition ${filter === 'all'
                 ? 'bg-primary text-white'
                 : 'bg-card text-muted-foreground hover:bg-accent border border-border'
-            }`}
+              }`}
           >
             All <span className="text-xs opacity-70">{stocks.length}</span>
           </button>
           <button
             onClick={() => setFilter('gainers')}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
-              filter === 'gainers'
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition ${filter === 'gainers'
                 ? 'bg-green-500 text-white'
                 : 'bg-card text-muted-foreground hover:bg-accent border border-border'
-            }`}
+              }`}
           >
             Gainers <span className="text-xs opacity-70">{stocks.filter(s => s.change_pct > 0).length}</span>
           </button>
           <button
             onClick={() => setFilter('losers')}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
-              filter === 'losers'
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition ${filter === 'losers'
                 ? 'bg-red-500 text-white'
                 : 'bg-card text-muted-foreground hover:bg-accent border border-border'
-            }`}
+              }`}
           >
             Losers <span className="text-xs opacity-70">{stocks.filter(s => s.change_pct < 0).length}</span>
           </button>
@@ -352,9 +345,8 @@ export default function Markets() {
                     ₹{(stock.price * USD_TO_INR).toLocaleString('en-IN', { maximumFractionDigits: 2 })}
                   </td>
                   <td className="px-6 py-4 text-right">
-                    <div className={`inline-flex items-center gap-1 font-medium ${
-                      stock.change_pct >= 0 ? 'text-green-500' : 'text-red-500'
-                    }`}>
+                    <div className={`inline-flex items-center gap-1 font-medium ${stock.change_pct >= 0 ? 'text-green-500' : 'text-red-500'
+                      }`}>
                       {stock.change_pct >= 0 ? <TrendingUp className="w-4 h-4" /> : <TrendingDown className="w-4 h-4" />}
                       {stock.change_pct >= 0 ? '+' : ''}{stock.change_pct.toFixed(2)}%
                     </div>
@@ -362,7 +354,7 @@ export default function Markets() {
                   <td className="px-6 py-4 text-right">
                     <button
                       onClick={() => setSelectedStock(stock)}
-                      className="px-4 py-2 bg-primary text-white text-sm font-medium rounded-lg hover:bg-primary/90 transition"
+                      className="px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700 transition"
                     >
                       Trade
                     </button>
@@ -374,9 +366,9 @@ export default function Markets() {
         </div>
       </main>
 
-      <TradeModal 
-        stock={selectedStock} 
-        onClose={() => setSelectedStock(null)} 
+      <TradeModal
+        stock={selectedStock}
+        onClose={() => setSelectedStock(null)}
         onTrade={handleTrade}
         userHoldings={userHoldings}
       />
