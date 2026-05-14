@@ -196,6 +196,7 @@ export default function Markets() {
   };
 
   useEffect(() => {
+
     const ws = new WebSocket(`${WS_BASE}/ws`);
 
     ws.onopen = () => {
